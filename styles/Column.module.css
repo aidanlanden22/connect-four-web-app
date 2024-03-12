@@ -1,0 +1,61 @@
+.column {
+    display: flex;
+    flex-direction: column;
+    grid-row: 1/8;
+    position: relative;
+}
+
+.columnHeader {
+    border-radius: 9999px;
+    flex: 1;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 7rem;
+    height: 5.6rem;
+    margin: var(--marker-margin);   
+}
+.columnHeaderText {
+    position: absolute;
+}
+
+.columnContents { 
+    position: relative;
+    flex: 7;
+    background-color: #2563eb;
+    display: flex;
+    flex-direction: column;
+    z-index: auto;
+    overflow: hidden;
+}
+.cell {
+    position: relative;
+    border-radius: 9999px;
+    background-color: white;
+    flex: 1;
+    margin: var(--marker-margin);
+    width: 7rem;
+    height: 5.6rem;
+    overflow: hidden;
+}
+@keyframes fall-through {
+    0% {
+        transform: translatey(-7.5rem);
+    }
+    100% {
+        transform: translateY(7.5rem);
+    }
+}
+.animated {
+    position: absolute;
+    width: 7rem;
+    height: 7rem;
+    border-radius: 9999px;
+    background-color: green;
+    z-index: 2;
+    animation-name: fall-through;
+    animation-duration: 150ms;
+    transform: translateY(-7.5rem);
+}

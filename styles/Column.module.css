@@ -17,6 +17,7 @@
     height: 5.6rem;
     margin: var(--marker-margin);   
 }
+
 .columnHeaderText {
     position: absolute;
 }
@@ -53,7 +54,6 @@
     width: 7rem;
     height: 7rem;
     border-radius: 9999px;
-    background-color: green;
     z-index: 2;
     animation-name: fall-through;
     animation-duration: 150ms;

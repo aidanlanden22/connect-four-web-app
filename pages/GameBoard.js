@@ -7,14 +7,14 @@ export default function GameBoard({
   switchPlayerTurn,
   declareWinner,
   boardState,
-  setBoardState,
+  sendBoardState,
 }) {
   function dropPiece(column) {
     for (let i = 5; i >= 0; i--) {
       if (boardState[i][column] === 0) {
         let updatedBoard = boardState;
         updatedBoard[i][column] = activePlayer;
-        setBoardState(updatedBoard);
+        sendBoardState(updatedBoard);
         let winningMove = checkForWinner(i, column, activePlayer.id);
         if (winningMove.length) declareWinner();
         else switchPlayerTurn();

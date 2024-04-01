@@ -1,8 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import GameBoard from "./GameBoard";
 import WinnerMessage from "./WinnerMessage";
+import useWebSocket from "react-use-websocket";
+
+const WS_URL = "ws://localhost:8080/ws";
 
 export default function Game() {
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket(WS_URL, {
+    onOpen: () => {
+      console.log("WebSocket connection successful");
+    },
+    share: true,
+    shouldReconnect: () => true,
+  });
+
+  useEffect(() => {
+    console.log("got a new message: ", lastJsonMessage);
+  }, [lastJsonMessage]);
+
   const player1 = { id: 1, color: "#f87171" };
   const player2 = { id: 2, color: "#facc15" };
   const [activePlayer, setActivePlayer] = useState(
@@ -12,6 +27,15 @@ export default function Game() {
   const [hasWinner, setHasWinner] = useState(false);
   const [winnerMessage, setWinnerMessage] = useState("");
   const [boardState, setBoardState] = useState(initializeBoard());
+
+  function emitBoardState(state) {
+    sendJsonMessage({
+      gameId: "00",
+      player: "01",
+      state: JSON.stringify(state),
+    });
+    setBoardState(state);
+  }
 
   function initializeBoard() {
     let initialBoard = [];
@@ -44,7 +68,7 @@ export default function Game() {
         setWinningMove={setWinningMove}
         declareWinner={declareWinner}
         boardState={boardState}
-        setBoardState={setBoardState}
+        sendBoardState={emitBoardState}
       />
       <WinnerMessage
         hasWinner={hasWinner}

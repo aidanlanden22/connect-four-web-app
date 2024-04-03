@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import styles from "../styles/Column.module.css";
-export default function Column({ playerColor, dropPiece, columnState }) {
+export default function Column({
+  playerColor,
+  dropPiece,
+  columnState,
+  isTurn,
+}) {
   const [headerStyles, setHeaderStyles] = useState("white");
   const [cellColor, setCellColor] = useState(Array(6).fill("white"));
   const [isHovered, setIsHovered] = useState(false);
@@ -16,7 +21,8 @@ export default function Column({ playerColor, dropPiece, columnState }) {
     if (isHovered) setHeaderStyles(`${playerColor}`);
   }, [columnState]);
   function handleHover(event) {
-    if (event === "onEnter") {
+    if (event === "onEnter" && isTurn) {
+      console.log(isTurn);
       setIsHovered(true);
       setHeaderStyles(`${playerColor}`);
     } else {

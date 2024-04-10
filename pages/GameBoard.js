@@ -3,12 +3,9 @@ import WinnerMessage from "./WinnerMessage";
 import styles from "../styles/GameBoard.module.css";
 import { useState } from "react";
 
-const columnIdx = Array.from(Array(7).keys());
-console.log(columnIdx);
+const columns = Array.from(Array(7).keys());
 export default function GameBoard({
-  activePlayer,
-  switchPlayerTurn,
-  declareWinner,
+  player,
   boardState,
   sendBoardState,
   isTurn,
@@ -18,11 +15,12 @@ export default function GameBoard({
       for (let i = 5; i >= 0; i--) {
         if (boardState[i][column] === 0) {
           let updatedBoard = boardState;
-          updatedBoard[i][column] = activePlayer;
-          sendBoardState(updatedBoard);
-          let winningMove = checkForWinner(i, column, activePlayer.id);
-          if (winningMove.length) declareWinner();
-          //else switchPlayerTurn();
+          updatedBoard[i][column] = player;
+          let winningMove = checkForWinner(i, column, player.id);
+          sendBoardState({
+            boardState: updatedBoard,
+            hasWinner: winningMove.length ? true : false,
+          });
           break;
         }
       }
@@ -99,10 +97,10 @@ export default function GameBoard({
 
   return (
     <div className={styles.gameBoard}>
-      {columnIdx.map((i) => {
+      {columns.map((i) => {
         return (
           <Column
-            playerColor={activePlayer.color}
+            playerColor={player.color}
             dropPiece={() => dropPiece(i)}
             columnState={boardState.map((row) => row[i])}
             isTurn={isTurn}

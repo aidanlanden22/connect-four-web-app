@@ -22,7 +22,6 @@ export default function Column({
   }, [columnState]);
   function handleHover(event) {
     if (event === "onEnter" && isTurn) {
-      console.log(isTurn);
       setIsHovered(true);
       setHeaderStyles(`${playerColor}`);
     } else {

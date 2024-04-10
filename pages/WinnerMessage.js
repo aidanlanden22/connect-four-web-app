@@ -10,7 +10,9 @@ export default function WinnerMessage({ restart, winner, self }) {
       : `${winner?.name} wins :( Better luck next time.`;
   return (
     <div className={className}>
-      <div className={styles.winnerMessageText}>{winnerMessage} </div>
+      {winner && (
+        <div className={styles.winnerMessageText}>{winnerMessage} </div>
+      )}
       <button className={styles.restart} onClick={restart}>
         Restart
       </button>

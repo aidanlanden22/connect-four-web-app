@@ -8,11 +8,19 @@ import Waiting from "./Waiting";
 import PlayerInfo from "./PlayerInfo";
 import GameTracker from "./GameTracker";
 import styles from "./../styles/Game.module.css";
+import { useRouter } from "next/router";
 
 const WS_URL = "ws://localhost:8080/ws";
 
 export default function Game() {
-  const [cookies, setCookie] = useCookies(["userId", "userColor", "username"]);
+  const router = useRouter();
+  const gameId = router.query.gameId;
+  const [cookies, setCookie] = useCookies([
+    "userId",
+    "userColor",
+    "username",
+    "gameId",
+  ]);
   const [player, setPlayer] = useState({
     name: null,
     color: null,
@@ -56,7 +64,6 @@ export default function Game() {
       if (!lastJsonMessage.players.some((p) => p.id === player.id)) {
         players.push(player);
         lastPlayer = players[Math.round(Math.random())].id;
-        console.log("setting last player... ", lastPlayer);
         const payload = formatGameState({
           state: lastJsonMessage.boardState,
           players: players,
@@ -81,13 +88,16 @@ export default function Game() {
         color: cookies["userColor"],
       });
     }
+    if (cookies["gameId"]) {
+      setGameId(cookies["gameId"]);
+    }
   }
 
-  function sendInitialGameState() {
+  function sendInitialGameState({ name, color }) {
     const payload = formatGameState({
       state: initializeBoard(),
       lastPlayer: null,
-      players: [player],
+      players: [{ name: name, color: color, id: player.id }],
     });
     console.log("sending initial payload...", payload);
     sendJsonMessage(payload);
@@ -100,7 +110,7 @@ export default function Game() {
     winner = null,
   }) {
     return {
-      gameId: "00",
+      gameId: gameId,
       player: player.id,
       state: JSON.stringify({
         boardState: state,
@@ -145,7 +155,7 @@ export default function Game() {
     });
     setCookie("username", name, { path: "/" });
     setCookie("userColor", color, { path: "/" });
-    sendInitialGameState();
+    sendInitialGameState({ name: name, color: color });
   }
 
   function getOtherPlayer() {
@@ -158,7 +168,7 @@ export default function Game() {
     setActivePlayer(Math.round(Math.random()) ? player1 : player2);
   }*/
 
-  console.log(player);
+  console.log(lastJsonMessage);
   console.log(gameState);
   return (
     <div className={styles.game}>
@@ -175,7 +185,7 @@ export default function Game() {
         sendBoardState={sendBoardState}
         isTurn={gameState.lastPlayer !== player.id}
       />
-      <WinnerMessage restart={() => {}} winner={winner?.id} />
+      <WinnerMessage restart={() => {}} winner={winner} self={player.id} />
       {!player.name && <PlayerInfo setPlayerInfo={setPlayerInfo} />}
       {!gameState.lastPlayer && player.name && <Waiting />}
     </div>

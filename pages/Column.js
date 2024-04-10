@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styles from "../styles/Column.module.css";
+import styles from "./../styles/Column.module.css";
 export default function Column({
   playerColor,
   dropPiece,

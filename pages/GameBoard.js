@@ -1,7 +1,5 @@
 import Column from "./Column";
-import WinnerMessage from "./WinnerMessage";
-import styles from "../styles/GameBoard.module.css";
-import { useState } from "react";
+import styles from "./../styles/GameBoard.module.css";
 
 const columns = Array.from(Array(7).keys());
 export default function GameBoard({

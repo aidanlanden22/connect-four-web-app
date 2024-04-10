@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "../styles/PlayerInfo.module.css";
+import styles from "./../styles/PlayerInfo.module.css";
 import Colors from "./Colors";
 
 export default function PlayerInfo({ setPlayerInfo }) {

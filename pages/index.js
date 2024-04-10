@@ -1,7 +1,6 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
-import Game from "./Game";
+import GameAdmin from "./GameAdmin";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,7 +14,7 @@ export default function Home() {
         <link rel="stylesheet" href="styles.css"></link>
       </Head>
       <main>
-        <Game />
+        <GameAdmin />
       </main>
     </>
   );

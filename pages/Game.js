@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import GameBoard from "./GameBoard";
 import WinnerMessage from "./WinnerMessage";
 import useWebSocket from "react-use-websocket";
@@ -14,12 +14,12 @@ const WS_URL = "ws://localhost:8080/ws";
 
 export default function Game() {
   const router = useRouter();
-  const gameId = router.query.gameId;
   const [cookies, setCookie] = useCookies([
     "userId",
     "userColor",
     "username",
     "gameId",
+    "gameState",
   ]);
   const [player, setPlayer] = useState({
     name: null,
@@ -28,22 +28,30 @@ export default function Game() {
   });
   const [winner, setWinner] = useState(null);
   const [gameState, setGameState] = useState({
+    version: 0,
     boardState: initializeBoard(),
     players: [player],
     lastPlayer: null,
     winner: null,
   });
+  const gameId = router.query.gameId ?? cookies["gameId"];
 
-  const { sendJsonMessage, lastJsonMessage, lastMessage, readyState } =
-    useWebSocket(WS_URL, {
-      onOpen: () => {
-        console.log("WebSocket connection successful");
-      },
-      share: true,
-      retryOnError: true,
-      shouldReconnect: () => true,
-    });
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket(WS_URL, {
+    onOpen: () => {
+      console.log("WebSocket connection successful");
+      // If recconecting, send game state to syncrhonize with oppoenent
+      if (cookies["gameState"]) {
+        const payload = formatGameState({ lastPlayer: gameState.lastPlayer });
+        console.log(payload);
+        sendJsonMessage(payload);
+      }
+    },
+    share: true,
+    retryOnError: true,
+    shouldReconnect: () => true,
+  });
 
+  // On initital render generate userId cookie if none, check for other cookie values
   useEffect(() => {
     if (!cookies["userId"]) {
       const id = uuid();
@@ -57,21 +65,47 @@ export default function Game() {
   }, []);
 
   useEffect(() => {
+    if (gameId && !cookies["gameId"]) {
+      setCookie("gameId", gameId, { path: "/" });
+    }
+  }, [gameId]);
+
+  useEffect(() => {
+    if (gameState.version) setCookie("gameState", gameState, { path: "/" });
+  }, [gameState]);
+
+  useEffect(() => {
+    console.log(gameState);
     if (lastJsonMessage?.hasOwnProperty("boardState")) {
+      // If oppenent has a less recent game state, send newer version
+      if (
+        lastJsonMessage.version &&
+        lastJsonMessage.version < gameState.version
+      ) {
+        const payload = formatGameState({ lastPlayer: gameState.lastPlayer });
+        sendJsonMessage(payload);
+        return;
+      }
+
       let players = lastJsonMessage.players;
       let lastPlayer = lastJsonMessage.lastPlayer;
-      // both players have connected and now the driver player is determining who goes first
+      let version = lastJsonMessage.version;
+      // Both players have connected and now the driver player determinines who goes first
       if (!lastJsonMessage.players.some((p) => p.id === player.id)) {
         players.push(player);
         lastPlayer = players[Math.round(Math.random())].id;
+        version = 1;
         const payload = formatGameState({
+          version: version,
           state: lastJsonMessage.boardState,
           players: players,
           lastPlayer: lastPlayer,
         });
         sendJsonMessage(payload);
       }
+
       setGameState({
+        version: version,
         boardState: lastJsonMessage.boardState,
         players: players,
         lastPlayer: lastPlayer,
@@ -84,12 +118,13 @@ export default function Game() {
   function checkForCookies() {
     if (cookies["username"]) {
       setPlayer({
+        ...player,
         name: cookies["username"],
         color: cookies["userColor"],
       });
     }
-    if (cookies["gameId"]) {
-      setGameId(cookies["gameId"]);
+    if (cookies["gameState"]) {
+      setGameState(cookies["gameState"]);
     }
   }
 
@@ -104,7 +139,8 @@ export default function Game() {
   }
 
   function formatGameState({
-    state,
+    version = gameState.version,
+    state = gameState.boardState,
     players = gameState.players,
     lastPlayer = player.id,
     winner = null,
@@ -113,6 +149,7 @@ export default function Game() {
       gameId: gameId,
       player: player.id,
       state: JSON.stringify({
+        version: version,
         boardState: state,
         players: players,
         lastPlayer: lastPlayer,
@@ -124,6 +161,7 @@ export default function Game() {
   function sendBoardState({ boardState, hasWinner }) {
     console.log("has winner: ", hasWinner);
     const payload = formatGameState({
+      version: gameState.version++,
       state: boardState,
       winner: hasWinner ? player : null,
     });
@@ -132,6 +170,7 @@ export default function Game() {
       ...gameState,
       boardState: boardState,
       lastPlayer: player.id,
+      version: gameState.version++,
     });
     if (hasWinner) setWinner(player);
   }
@@ -168,8 +207,6 @@ export default function Game() {
     setActivePlayer(Math.round(Math.random()) ? player1 : player2);
   }*/
 
-  console.log(lastJsonMessage);
-  console.log(gameState);
   return (
     <div className={styles.game}>
       {gameState.lastPlayer && (

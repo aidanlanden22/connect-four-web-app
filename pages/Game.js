@@ -37,6 +37,7 @@ export default function Game() {
   const [oppponentConnected, setOpponentConnected] = useState(false);
   const [opponentColor, setOpponentColor] = useState(null);
   let gameId = router.query.gameId ?? cookies["gameId"];
+
   // Will use to send initital websocket message once gameId and player id are set
   let ready = gameId && player.id;
 
@@ -57,7 +58,6 @@ export default function Game() {
     });
 
   useEffect(() => {
-    console.log(lastMessage);
     if (lastMessage && lastMessage.data !== "failure") {
       setOpponentConnected(true);
     }
@@ -101,6 +101,7 @@ export default function Game() {
 
   useEffect(() => {
     // Handle opponent color selection message
+    console.log(lastJsonMessage);
     if (lastJsonMessage?.hasOwnProperty("color")) {
       setOpponentColor(lastJsonMessage.color);
       setGameState({
@@ -128,23 +129,6 @@ export default function Game() {
         return;
       }
 
-      // let players = lastJsonMessage.players;
-      // let lastPlayer = lastJsonMessage.lastPlayer;
-      // let version = lastJsonMessage.version;
-      // // Both players have connected and now the driver player determinines who goes first
-      // if (!lastJsonMessage.players.some((p) => p.id === player.id)) {
-      //   players.push(player);
-      //   lastPlayer = players[Math.round(Math.random())].id;
-      //   version = 1;
-      //   const payload = formatGameState({
-      //     version: version,
-      //     state: lastJsonMessage.boardState,
-      //     players: players,
-      //     lastPlayer: lastPlayer,
-      //   });
-      //   sendJsonMessage(payload);
-      // }
-
       setGameState({
         version: lastJsonMessage.version,
         boardState: lastJsonMessage.boardState,
@@ -152,10 +136,11 @@ export default function Game() {
         lastPlayer: lastJsonMessage.lastPlayer,
         winner: lastJsonMessage.winner,
       });
-      if (lastJsonMessage.winner) setWinner(lastJsonMessage.winner);
+      setWinner(lastJsonMessage.winner);
     }
   }, [lastJsonMessage]);
 
+  // Load cookie values into state if any
   function checkForCookies() {
     if (cookies["username"]) {
       setPlayer({
@@ -169,6 +154,7 @@ export default function Game() {
     }
   }
 
+  // Send color selection to opponent
   function sendInitialGameState(color) {
     sendJsonMessage({
       gameId: gameId,
@@ -201,6 +187,7 @@ export default function Game() {
     };
   }
 
+  // Send updated board state to opponent following move
   function sendBoardState({ boardState, hasWinner }) {
     const newVersion = gameState.version + 1;
     const payload = formatGameState({
@@ -218,6 +205,7 @@ export default function Game() {
     if (hasWinner) setWinner(player);
   }
 
+  // Initialize empty board
   function initializeBoard() {
     let initialBoard = [];
     for (let i = 0; i < 6; i++) {
@@ -229,6 +217,7 @@ export default function Game() {
     return initialBoard;
   }
 
+  // Initilaize game by generating a random player to go first
   function startGame() {
     const { boardState, players } = gameState;
     // Both players have connected and now the driver player determinines who goes first
@@ -250,6 +239,7 @@ export default function Game() {
     });
   }
 
+  // Set player info following color selection
   function setPlayerInfo(color) {
     // Update Player color
     setPlayer({
@@ -276,15 +266,26 @@ export default function Game() {
     sendInitialGameState(color);
   }
 
+  // Helper function to get opponent from players list
   function getOtherPlayer() {
     return gameState.players.find((p) => p.id !== player.id);
   }
 
-  /*function restartGame() {
-    setHasWinner(false);
-    setBoardState(initializeBoard());
-    setActivePlayer(Math.round(Math.random()) ? player1 : player2);
-  }*/
+  function restartGame() {
+    setWinner(null);
+    const lastPlayer = gameState.players[Math.round(Math.random())].id;
+    const version = gameState.version + 1;
+    const newBoard = initializeBoard();
+    setGameState({
+      ...gameState,
+      version: version,
+      boardState: newBoard,
+      lastPlayer: lastPlayer,
+      winner: null,
+    });
+    const payload = formatGameState({ lastPlayer, state: newBoard });
+    sendJsonMessage(payload);
+  }
 
   return (
     <div className={styles.game}>
@@ -301,7 +302,7 @@ export default function Game() {
         sendBoardState={sendBoardState}
         isTurn={gameState.lastPlayer !== player.id}
       />
-      <WinnerMessage restart={() => {}} winner={winner} self={player.id} />
+      <WinnerMessage restart={restartGame} winner={winner} self={player.id} />
       {!oppponentConnected && <Waiting />}
       {oppponentConnected && !gameState.lastPlayer && (
         <PlayerInfo

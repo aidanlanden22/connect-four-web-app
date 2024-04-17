@@ -1,27 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./../styles/PlayerInfo.module.css";
 import Colors from "./Colors";
+let colors = [
+  { name: "Green", color: "#22c55e" },
+  { name: "Orange", color: "#f59e0b" },
+  { name: "Red", color: "#ef4444" },
+  { name: "Purple", color: "#8b5cf6" },
+  { name: "Pink", color: "#ec4899" },
+];
 
-export default function PlayerInfo({ setPlayerInfo }) {
+export default function PlayerInfo({
+  setPlayerInfo,
+  opponentColor,
+  startGame,
+}) {
   const [color, setColor] = useState(null);
+  const [active, setActive] = useState(null);
   const [hasName, setHasName] = useState(false);
-  function handleFormData(event) {
+  useEffect(() => {
+    if (color) setPlayerInfo(color);
+  }, [color]);
+  function handleSubmit(event) {
     event.preventDefault();
-    const name = event.target["name"].value;
-    setPlayerInfo({ name: name, color: color });
+    startGame();
   }
-  function handleNameChange(e) {
-    if (e.target.value.length > 0) {
-      setHasName(true);
-    }
-    if (e.target.value.length === 0) {
-      setHasName(false);
-    }
-  }
+
   return (
     <>
-      <form className={styles.playerInfo} onSubmit={handleFormData}>
-        <div className={styles.inputField}>
+      <form className={styles.playerInfo} onSubmit={handleSubmit}>
+        {/* <div className={styles.inputField}>
           <label htmlFor="name">Name:</label>
           <input
             type="text"
@@ -29,17 +36,32 @@ export default function PlayerInfo({ setPlayerInfo }) {
             className={styles.input}
             onChange={handleNameChange}
           ></input>
-        </div>
+        </div> */}
         <div className={styles.inputField}>
           <label htmlFor="color">Pick a Color:</label>
-          <Colors setColor={setColor} />
+          {colors.map(({ name, color }, index) => {
+            return (
+              <div
+                className={`${styles.color} ${
+                  active == index ? styles.active : ""
+                } ${color === opponentColor ? styles.selected : ""}`}
+                style={{ backgroundColor: color }}
+                onClick={() => {
+                  if (color !== opponentColor) {
+                    setActive(index);
+                    setColor({ name, color });
+                  }
+                }}
+              ></div>
+            );
+          })}
         </div>
         <button
           type="submit"
           className={styles.button}
-          disabled={!hasName || !color}
+          disabled={!opponentColor || !color}
         >
-          Submit
+          Start Game
         </button>
       </form>
     </>

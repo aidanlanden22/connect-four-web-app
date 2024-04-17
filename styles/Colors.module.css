@@ -6,3 +6,8 @@
     background-color: #22c55e;
     cursor: pointer;
 }
+
+.active {
+    border: .5rem solid #3b82f6;
+
+}

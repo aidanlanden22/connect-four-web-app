@@ -3,10 +3,12 @@ import { useState } from "react";
 import { v4 as uuid } from "uuid";
 import Link from "next/link";
 import { Didact_Gothic } from "next/font/google";
+import { useCookies } from "react-cookie";
 
 const DOMAIN = "Game/";
 export default function GameAdmin() {
   const router = useRouter();
+  const [cookies, setCookie] = useCookies(["userId"]);
   const [gameId, setGameId] = useState(null);
   function generateGameId() {
     setGameId(uuid());

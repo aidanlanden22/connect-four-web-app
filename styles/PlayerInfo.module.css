@@ -40,3 +40,21 @@
     background-color: #78716c;
     cursor: default;
 }
+
+.color {
+    border: 1px solid color;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    background-color: #22c55e;
+    cursor: pointer;
+}
+
+.active {
+    border: .5rem solid #3b82f6;
+
+}
+.selected {
+    cursor: not-allowed;
+    filter: grayscale(75%);
+}

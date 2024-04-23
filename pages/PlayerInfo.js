@@ -28,15 +28,6 @@ export default function PlayerInfo({
   return (
     <>
       <form className={styles.playerInfo} onSubmit={handleSubmit}>
-        {/* <div className={styles.inputField}>
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            className={styles.input}
-            onChange={handleNameChange}
-          ></input>
-        </div> */}
         <div className={styles.inputField}>
           <label htmlFor="color">Pick a Color:</label>
           {colors.map(({ name, color }, index) => {
@@ -51,6 +42,7 @@ export default function PlayerInfo({
                     setActive(index);
                     setColor({ name, color });
                   }
+                  key = { index };
                 }}
               ></div>
             );

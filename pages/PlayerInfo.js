@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "./../styles/PlayerInfo.module.css";
-import Colors from "./Colors";
+
 let colors = [
   { name: "Green", color: "#22c55e" },
   { name: "Orange", color: "#f59e0b" },

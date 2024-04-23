@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Didact_Gothic } from "next/font/google";
 import { useCookies } from "react-cookie";
 
-const DOMAIN = "Game/";
+const DOMAIN =
+  "https://connect-four-web-3u2skgh4w-aidanlanden22s-projects.vercel.app/";
 export default function GameAdmin() {
   const router = useRouter();
   const [cookies, setCookie] = useCookies(["userId"]);

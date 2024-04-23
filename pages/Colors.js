@@ -17,6 +17,7 @@ export default function Colors({ setColor }) {
               setActive(index);
               setColor(color);
             }}
+            key={index}
           ></div>
         );
       })}

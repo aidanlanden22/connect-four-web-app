@@ -102,6 +102,7 @@ export default function GameBoard({
             dropPiece={() => dropPiece(i)}
             columnState={boardState.map((row) => row[i])}
             isTurn={isTurn}
+            key={i}
           />
         );
       })}

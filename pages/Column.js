@@ -30,25 +30,18 @@ export default function Column({
     }
   }
 
-  /*const animateMove = () => {
-    let emptyCells = columnState.reduce((accumulator, currentValue) => {
-      if (currentValue === 0) accumulator++;
-      return accumulator;
-    });
-    for (let i = 0; i < emptyCells; i++) {
-      setTimeout(() => {
-        animations[i] = `${styles.animated}`;
-      }, 85.7 * i);
-    }
+  function handleClick() {
+    setIsHovered(false);
+    setHeaderStyles("white");
     dropPiece();
-  }; */
+  }
 
   return (
     <div
       className={styles.column}
       onMouseEnter={() => handleHover("onEnter")}
       onMouseLeave={() => handleHover("onLeave")}
-      onClick={dropPiece}
+      onClick={handleClick}
     >
       <div
         className={styles.columnHeader}

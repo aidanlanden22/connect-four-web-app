@@ -10,7 +10,7 @@ import GameTracker from "./GameTracker";
 import styles from "./../styles/Game.module.css";
 import { useRouter } from "next/router";
 
-const WS_URL = "ws://localhost:8080/ws";
+const WS_URL = "ws://159.203.173.100:8080/ws";
 
 export default function Game() {
   const router = useRouter();
@@ -99,9 +99,10 @@ export default function Game() {
     if (gameState.version) setCookie("gameState", gameState, { path: "/" });
   }, [gameState]);
 
+  // TODO: useEffect hook for sending json message with each gamestate upadte
+
   useEffect(() => {
     // Handle opponent color selection message
-    console.log(lastJsonMessage);
     if (lastJsonMessage?.hasOwnProperty("color")) {
       setOpponentColor(lastJsonMessage.color);
       setGameState({

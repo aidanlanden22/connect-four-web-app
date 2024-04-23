@@ -100,7 +100,7 @@ export default function GameBoard({
           <Column
             playerColor={player?.color}
             dropPiece={() => dropPiece(i)}
-            columnState={boardState.map((row) => row[i])}
+            columnState={boardState?.map((row) => row[i])}
             isTurn={isTurn}
             key={i}
           />

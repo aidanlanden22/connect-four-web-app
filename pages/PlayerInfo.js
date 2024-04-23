@@ -42,8 +42,8 @@ export default function PlayerInfo({
                     setActive(index);
                     setColor({ name, color });
                   }
-                  key = { index };
                 }}
+                key={index}
               ></div>
             );
           })}

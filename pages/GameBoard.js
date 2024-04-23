@@ -14,7 +14,7 @@ export default function GameBoard({
         if (boardState[i][column] === 0) {
           let updatedBoard = boardState;
           updatedBoard[i][column] = player;
-          let winningMove = checkForWinner(i, column, player.id);
+          let winningMove = checkForWinner(i, column, player?.id);
           sendBoardState({
             boardState: updatedBoard,
             hasWinner: winningMove.length ? true : false,
@@ -98,7 +98,7 @@ export default function GameBoard({
       {columns.map((i) => {
         return (
           <Column
-            playerColor={player.color}
+            playerColor={player?.color}
             dropPiece={() => dropPiece(i)}
             columnState={boardState.map((row) => row[i])}
             isTurn={isTurn}

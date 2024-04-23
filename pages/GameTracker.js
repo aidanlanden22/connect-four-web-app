@@ -1,7 +1,7 @@
 import styles from "./../styles/GameTracker.module.css";
 export default function GameTracker({ lastPlayer, opponent, self }) {
-  const whoseTurn =
-    lastPlayer === self.id ? (
+  const activePlayer =
+    lastPlayer === self?.id ? (
       <span style={{ color: opponent.color }}>{opponent.name}&apos;s</span>
     ) : (
       <span style={{ color: self.color }}>your</span>
@@ -15,7 +15,7 @@ export default function GameTracker({ lastPlayer, opponent, self }) {
         Your Opponent is{" "}
         <span style={{ color: opponent.color }}>{opponent.name}</span>
       </div>
-      <div>It is {whoseTurn} turn</div>
+      <div>It is {activePlayer} turn</div>
     </div>
   );
 }

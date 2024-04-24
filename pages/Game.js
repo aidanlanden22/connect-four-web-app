@@ -10,7 +10,7 @@ import GameTracker from "./GameTracker";
 import styles from "./../styles/Game.module.css";
 import { useRouter } from "next/router";
 
-const WS_URL = "ws://159.203.173.100:8080/ws";
+const WS_URL = "wss://159.203.173.100:8080/ws";
 
 export default function Game() {
   const router = useRouter();
@@ -41,8 +41,9 @@ export default function Game() {
   // Will use to send initital websocket message once gameId and player id are set
   let ready = gameId && player.id;
 
-  const { sendJsonMessage, lastJsonMessage, lastMessage, readyState } =
-    useWebSocket(WS_URL, {
+  const { sendJsonMessage, lastJsonMessage, lastMessage } = useWebSocket(
+    WS_URL,
+    {
       onOpen: () => {
         console.log("WebSocket connection successful");
         // If recconecting, send game state to syncrhonize with oppoenent
@@ -55,9 +56,11 @@ export default function Game() {
       },
       retryOnError: true,
       shouldReconnect: () => true,
-    });
+    }
+  );
 
   useEffect(() => {
+    console.log(lastMessage);
     if (lastMessage && lastMessage.data !== "failure") {
       setOpponentConnected(true);
     }

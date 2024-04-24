@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
 
-const DOMAIN = "https://connect-four-web-app.vercel.app/Game";
+const DOMAIN = "Game/";
 export default function GameAdmin() {
   const router = useRouter();
   const [gameId, setGameId] = useState(null);

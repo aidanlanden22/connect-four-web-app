@@ -10,7 +10,7 @@ import GameTracker from "./GameTracker";
 import styles from "./../styles/Game.module.css";
 import { useRouter } from "next/router";
 
-const WS_URL = "wss://connectfour.xyz/ws";
+const WS_URL = "wss://ws.connectfour.xyz/ws";
 
 export default function Game() {
   const router = useRouter();

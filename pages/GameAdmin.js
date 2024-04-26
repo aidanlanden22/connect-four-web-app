@@ -15,7 +15,6 @@ export default function GameAdmin() {
 
   return (
     <>
-      {gameId ? DOMAIN + gameId : ""}
       <button onClick={generateGameId} disabled={gameId}>
         Generate Link
       </button>

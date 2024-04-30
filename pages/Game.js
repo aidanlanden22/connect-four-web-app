@@ -30,7 +30,7 @@ export default function Game() {
   const [gameState, setGameState] = useState({
     version: 0,
     boardState: initializeBoard(),
-    players: [player],
+    players: [],
     lastPlayer: null,
     winner: null,
   });
@@ -253,10 +253,12 @@ export default function Game() {
     });
 
     // Update self in players gameState
+    console.log(gameState);
+    console.log("Player: ", player);
     setGameState({
       ...gameState,
       players: [
-        gameState.players.find((p) => p.id !== player.id),
+        gameState.players.find((p) => p?.id !== player.id),
         {
           name: color.name,
           color: color.color,

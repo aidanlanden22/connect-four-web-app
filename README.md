@@ -1,4 +1,16 @@
+# Stateless Connect Four
+
+![Connect Four UI](<../../Desktop/Screenshot 2024-04-30 at 1.42.36 PM.png>)
+
+## Play Connect Four with your friends online!
+
+Stateless Connect Four is a lightweight web application designed for quick and effortless games played over the web, hosted at [connectfour.xyz](https://connectfour.xyz)!
+
+The user's web client connects to a simple websocket server. The backend does not store any game state, instead state is passed back and forth between players over the websocket connection. This ensures a lighting quick and highly scalable web application. In the case of a player disconnecting, game state is stored in browser cookies and players are automatically reconnected upon navigating back to the game link.
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+### Usage
 
 ## Getting Started
 

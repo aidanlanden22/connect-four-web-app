@@ -60,7 +60,6 @@ export default function Game() {
   );
 
   useEffect(() => {
-    console.log(lastMessage);
     if (lastMessage && lastMessage.data !== "failure") {
       setOpponentConnected(true);
     }
@@ -253,8 +252,6 @@ export default function Game() {
     });
 
     // Update self in players gameState
-    console.log(gameState);
-    console.log("Player: ", player);
     setGameState({
       ...gameState,
       players: [

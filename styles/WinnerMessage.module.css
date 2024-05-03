@@ -5,22 +5,28 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: rgba(0,0,0,50%);
+    background-color: rgba(0, 0, 0, 50%);
     justify-content: center;
     align-items: center;
     color: white;
     font-size: 5rem;
-    z-index: 2,
+    z-index: 2;
+    font-family: var(--font-ubuntu-mono);
+
 }
+
 .winnerMessage.show {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
+
 .restart {
     border-radius: 2rem;
     width: 4rem;
     height: 2rem;
     background-color: white;
     color: black;
+    font-family: var(--font-ubuntu-mono);
+
 }

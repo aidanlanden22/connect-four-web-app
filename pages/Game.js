@@ -9,8 +9,12 @@ import PlayerInfo from "./PlayerInfo";
 import GameTracker from "./GameTracker";
 import styles from "./../styles/Game.module.css";
 import { useRouter } from "next/router";
+import { Ubuntu_Mono } from "next/font/google";
+
 
 const WS_URL = "wss://ws.connectfour.xyz/ws";
+
+const ubuntuMono = Ubuntu_Mono({ subsets: ["latin"], weight: '400', variable: '--font-ubuntu-mono', display: 'swap' });
 
 export default function Game() {
   const router = useRouter();
@@ -34,6 +38,7 @@ export default function Game() {
     lastPlayer: null,
     winner: null,
   });
+
   const [oppponentConnected, setOpponentConnected] = useState(false);
   const [opponentColor, setOpponentColor] = useState(null);
   let gameId = router.query.gameId ?? cookies["gameId"];
@@ -291,7 +296,7 @@ export default function Game() {
   }
 
   return (
-    <div className={styles.game}>
+    <div className={`${styles.game} ${ubuntuMono.variable}`}>
       {gameState.lastPlayer && (
         <GameTracker
           lastPlayer={gameState.lastPlayer}

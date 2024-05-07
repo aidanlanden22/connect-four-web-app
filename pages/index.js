@@ -1,8 +1,8 @@
-import Head from "next/head";
-import { Ubuntu_Mono } from "next/font/google";
-import GameAdmin from "./GameAdmin";
+import Head from 'next/head';
+import { Ubuntu_Mono } from 'next/font/google';
+import GameAdmin from './GameAdmin';
 
-const ubuntuMono = Ubuntu_Mono({ subsets: ["latin"], weight: '400', variable: '--font-ubuntu-mono', display: 'swap' });
+const ubuntuMono = Ubuntu_Mono({ subsets: ['latin'], weight: '400', variable: '--font-ubuntu-mono', display: 'swap' });
 
 export default function Home() {
   return (

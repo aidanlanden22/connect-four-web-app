@@ -1,34 +1,33 @@
-import { useState, useEffect, useLayoutEffect } from "react";
-import GameBoard from "./GameBoard";
-import WinnerMessage from "./WinnerMessage";
-import useWebSocket from "react-use-websocket";
-import { useCookies } from "react-cookie";
-import { v4 as uuid } from "uuid";
-import Waiting from "./Waiting";
-import PlayerInfo from "./PlayerInfo";
-import GameTracker from "./GameTracker";
-import styles from "./../styles/Game.module.css";
-import { useRouter } from "next/router";
-import { Ubuntu_Mono } from "next/font/google";
+import { useState, useEffect } from 'react';
+import GameBoard from './GameBoard';
+import WinnerMessage from './WinnerMessage';
+import useWebSocket from 'react-use-websocket';
+import { useCookies } from 'react-cookie';
+import { v4 as uuid } from 'uuid';
+import Waiting from './Waiting';
+import PlayerInfo from './PlayerInfo';
+import GameTracker from './GameTracker';
+import styles from './../styles/Game.module.css';
+import { useRouter } from 'next/router';
+import { Ubuntu_Mono } from 'next/font/google';
 
+const WS_URL = 'wss://ws.connectfour.xyz/ws';
 
-const WS_URL = "wss://ws.connectfour.xyz/ws";
-
-const ubuntuMono = Ubuntu_Mono({ subsets: ["latin"], weight: '400', variable: '--font-ubuntu-mono', display: 'swap' });
+const ubuntuMono = Ubuntu_Mono({ subsets: ['latin'], weight: '400', variable: '--font-ubuntu-mono', display: 'swap' });
 
 export default function Game() {
   const router = useRouter();
   const [cookies, setCookie] = useCookies([
-    "userId",
-    "userColor",
-    "username",
-    "gameId",
-    "gameState",
+    'userId',
+    'userColor',
+    'username',
+    'gameId',
+    'gameState',
   ]);
   const [player, setPlayer] = useState({
     name: null,
     color: null,
-    id: cookies["userId"],
+    id: cookies['userId'],
   });
   const [winner, setWinner] = useState(null);
   const [gameState, setGameState] = useState({
@@ -39,9 +38,9 @@ export default function Game() {
     winner: null,
   });
 
-  const [oppponentConnected, setOpponentConnected] = useState(false);
+  const [opponentConnected, setOpponentConnected] = useState(false);
   const [opponentColor, setOpponentColor] = useState(null);
-  let gameId = router.query.gameId ?? cookies["gameId"];
+  let gameId = router.query.gameId ?? cookies['gameId'];
 
   // Will use to send initital websocket message once gameId and player id are set
   let ready = gameId && player.id;
@@ -50,9 +49,9 @@ export default function Game() {
     WS_URL,
     {
       onOpen: () => {
-        console.log("WebSocket connection successful");
+        console.log('WebSocket connection successful');
         // If recconecting, send game state to syncrhonize with oppoenent
-        if (cookies["gameState"]) {
+        if (cookies['gameState']) {
           const payload = formatGameState({
             lastPlayer: gameState.lastPlayer,
           });
@@ -65,16 +64,16 @@ export default function Game() {
   );
 
   useEffect(() => {
-    if (lastMessage && lastMessage.data !== "failure") {
+    if (lastMessage && lastMessage.data !== 'failure') {
       setOpponentConnected(true);
     }
   }, [lastMessage]);
 
   // On initital render generate userId cookie if none, check for other cookie values
   useEffect(() => {
-    if (!cookies["userId"]) {
+    if (!cookies['userId']) {
       const id = uuid();
-      setCookie("userId", id, { path: "/" });
+      setCookie('userId', id, { path: '/' });
       setPlayer({
         ...player,
         id: id,
@@ -85,14 +84,14 @@ export default function Game() {
 
   // Once gameId has loaded from the router for the first time, set cookie
   useEffect(() => {
-    if (gameId && !cookies["gameId"]) {
-      setCookie("gameId", gameId, { path: "/" });
+    if (gameId && !cookies['gameId']) {
+      setCookie('gameId', gameId, { path: '/' });
     }
   }, [gameId]);
 
   // Once the gameId and player id is set, let other player know we've connected
   useEffect(() => {
-    if (ready && !cookies["gameState"]) {
+    if (ready && !cookies['gameState']) {
       sendJsonMessage({
         gameId: gameId,
         player: player.id,
@@ -103,14 +102,14 @@ export default function Game() {
 
   // Update gameState cookie every time theres a change
   useEffect(() => {
-    if (gameState.version) setCookie("gameState", gameState, { path: "/" });
+    if (gameState.version) setCookie('gameState', gameState, { path: '/' });
   }, [gameState]);
 
   // TODO: useEffect hook for sending json message with each gamestate upadte
 
   useEffect(() => {
     // Handle opponent color selection message
-    if (lastJsonMessage?.hasOwnProperty("color")) {
+    if (lastJsonMessage?.hasOwnProperty('color')) {
       setOpponentColor(lastJsonMessage.color);
       setGameState({
         ...gameState,
@@ -126,7 +125,7 @@ export default function Game() {
     }
 
     // Handle opponent board state message
-    if (lastJsonMessage?.hasOwnProperty("boardState")) {
+    if (lastJsonMessage?.hasOwnProperty('boardState')) {
       // If oppenent has a less recent game state, send newer version
       if (
         lastJsonMessage.version &&
@@ -150,15 +149,15 @@ export default function Game() {
 
   // Load cookie values into state if any
   function checkForCookies() {
-    if (cookies["username"]) {
+    if (cookies['username']) {
       setPlayer({
         ...player,
-        name: cookies["username"],
-        color: cookies["userColor"],
+        name: cookies['username'],
+        color: cookies['userColor'],
       });
     }
-    if (cookies["gameState"]) {
-      setGameState(cookies["gameState"]);
+    if (cookies['gameState']) {
+      setGameState(cookies['gameState']);
     }
   }
 
@@ -269,8 +268,8 @@ export default function Game() {
       ],
     });
 
-    setCookie("username", color.name, { path: "/" });
-    setCookie("userColor", color.color, { path: "/" });
+    setCookie('username', color.name, { path: '/' });
+    setCookie('userColor', color.color, { path: '/' });
     sendInitialGameState(color);
   }
 
@@ -311,8 +310,8 @@ export default function Game() {
         isTurn={gameState.lastPlayer !== player.id}
       />
       <WinnerMessage restart={restartGame} winner={winner} self={player.id} />
-      {!oppponentConnected && <Waiting />}
-      {oppponentConnected && !gameState.lastPlayer && (
+      {!opponentConnected && <Waiting />}
+      {opponentConnected && !gameState.lastPlayer && (
         <PlayerInfo
           setPlayerInfo={setPlayerInfo}
           opponentColor={opponentColor}

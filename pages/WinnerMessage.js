@@ -1,4 +1,4 @@
-import styles from "./../styles/WinnerMessage.module.css";
+import styles from './../styles/WinnerMessage.module.css';
 
 export default function WinnerMessage({ restart, winner, self }) {
   console.log(winner);
@@ -7,7 +7,7 @@ export default function WinnerMessage({ restart, winner, self }) {
     : `${styles.winnerMessage}`;
   const winnerMessage =
     winner?.id === self
-      ? "Congratualtions, you win!"
+      ? 'Congratualtions, you win!'
       : `${winner?.name} wins :( Better luck next time.`;
   return (
     <div className={className}>

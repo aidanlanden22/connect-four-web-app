@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import styles from "./../styles/PlayerInfo.module.css";
+import { useEffect, useState } from 'react';
+import styles from './../styles/PlayerInfo.module.css';
 
 let colors = [
-  { name: "Green", color: "#22c55e" },
-  { name: "Orange", color: "#f59e0b" },
-  { name: "Red", color: "#ef4444" },
-  { name: "Purple", color: "#8b5cf6" },
-  { name: "Pink", color: "#ec4899" },
+  { name: 'Green', color: '#22c55e' },
+  { name: 'Orange', color: '#f59e0b' },
+  { name: 'Red', color: '#ef4444' },
+  { name: 'Purple', color: '#8b5cf6' },
+  { name: 'Pink', color: '#ec4899' },
 ];
 
 export default function PlayerInfo({
@@ -16,7 +16,6 @@ export default function PlayerInfo({
 }) {
   const [color, setColor] = useState(null);
   const [active, setActive] = useState(null);
-  const [hasName, setHasName] = useState(false);
   useEffect(() => {
     if (color) setPlayerInfo(color);
   }, [color]);
@@ -34,8 +33,8 @@ export default function PlayerInfo({
             return (
               <div
                 className={`${styles.color} ${
-                  active == index ? styles.active : ""
-                } ${color === opponentColor ? styles.selected : ""}`}
+                  active == index ? styles.active : ''
+                } ${color === opponentColor ? styles.selected : ''}`}
                 style={{ backgroundColor: color }}
                 onClick={() => {
                   if (color !== opponentColor) {

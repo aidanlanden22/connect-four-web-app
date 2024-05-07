@@ -1,5 +1,5 @@
-import Column from "./Column";
-import styles from "./../styles/GameBoard.module.css";
+import Column from './Column';
+import styles from './../styles/GameBoard.module.css';
 
 const columns = Array.from(Array(7).keys());
 export default function GameBoard({

@@ -15,14 +15,14 @@
     position: relative;
     width: 5.25rem;
     height: 4.2rem;
-    margin: var(--marker-margin);   
+    margin: var(--marker-margin);
 }
 
 .columnHeaderText {
     position: absolute;
 }
 
-.columnContents { 
+.columnContents {
     position: relative;
     flex: 7;
     background-color: #3b82f6;
@@ -31,6 +31,7 @@
     z-index: auto;
     overflow: hidden;
 }
+
 .cell {
     position: relative;
     border-radius: 9999px;
@@ -41,14 +42,17 @@
     height: 4.2rem;
     overflow: hidden;
 }
+
 @keyframes fall-through {
     0% {
         transform: translatey(-7.5rem);
     }
+
     100% {
         transform: translateY(7.5rem);
     }
 }
+
 .animated {
     position: absolute;
     width: 7rem;

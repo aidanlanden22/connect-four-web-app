@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import GameBoard from './GameBoard';
 import WinnerMessage from './WinnerMessage';
-import useWebSocket from 'react-use-websocket';
-import { useCookies } from 'react-cookie';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { v4 as uuid } from 'uuid';
 import Waiting from './Waiting';
 import PlayerInfo from './PlayerInfo';
@@ -11,23 +10,17 @@ import styles from './../styles/Game.module.css';
 import { useRouter } from 'next/router';
 import { Ubuntu_Mono } from 'next/font/google';
 
-const WS_URL = 'wss://ws.connectfour.xyz/ws';
+const WS_URL = 'ws://localhost:8080/ws';
 
 const ubuntuMono = Ubuntu_Mono({ subsets: ['latin'], weight: '400', variable: '--font-ubuntu-mono', display: 'swap' });
 
 export default function Game() {
-  const router = useRouter();
-  const [cookies, setCookie] = useCookies([
-    'userId',
-    'userColor',
-    'username',
-    'gameId',
-    'gameState',
-  ]);
+  const { isReady, query } = useRouter();
+
   const [player, setPlayer] = useState({
     name: null,
     color: null,
-    id: cookies['userId'],
+    id: null,
   });
   const [winner, setWinner] = useState(null);
   const [gameState, setGameState] = useState({
@@ -40,69 +33,98 @@ export default function Game() {
 
   const [opponentConnected, setOpponentConnected] = useState(false);
   const [opponentColor, setOpponentColor] = useState(null);
-  let gameId = router.query.gameId ?? cookies['gameId'];
+  const [gameId, setGameId] = useState(null);
 
-  // Will use to send initital websocket message once gameId and player id are set
-  let ready = gameId && player.id;
-
-  const { sendJsonMessage, lastJsonMessage, lastMessage } = useWebSocket(
+  const { sendJsonMessage, lastJsonMessage, lastMessage, readyState } = useWebSocket(
     WS_URL,
     {
       onOpen: () => {
         console.log('WebSocket connection successful');
-        // If recconecting, send game state to syncrhonize with oppoenent
-        if (cookies['gameState']) {
-          const payload = formatGameState({
-            lastPlayer: gameState.lastPlayer,
-          });
-          sendJsonMessage(payload);
-        }
       },
       retryOnError: true,
       shouldReconnect: () => true,
     }
   );
 
+  // On initital render generate userId cookie if none, check for other cookie values
   useEffect(() => {
+    if(!localStorage.getItem('userId')) {  
+      const id = uuid();
+      localStorage.setItem('userId', id);
+      setPlayer({
+        ...player,
+        id: id,
+      });
+    } else {
+      console.log('setting Id ', localStorage.getItem('userId'));
+      setPlayer({
+        ...player,
+        id: localStorage.getItem('userId'),
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const playerId = localStorage.getItem('userId');
+    if(isReady && ReadyState.OPEN) {
+      setGameId(query.gameId);
+      let gameValues = localStorage.getItem(query.gameId);
+      if(gameValues) {
+        const { version, boardState, players, lastPlayer, winner } = JSON.parse(gameValues);
+        // Reaching a race condition when trying to access player id state value set in above use effect hook
+        // local storage updates faster and is more reliable in this instance 
+        const self = players.find(p => p.id === playerId);
+        console.log(self);
+        setPlayer({
+          id: playerId,
+          name: self.name,
+          color: self.color,
+        });
+        setGameState({
+          version,
+          boardState: boardState,
+          players,
+          lastPlayer,
+          winner
+        });
+        if(winner) {
+          setWinner(winner);
+        }
+
+        // If reconnecting, send game state to synchronize with opponent
+        const payload = formatGameState({
+          version,
+          state: boardState,
+          players,
+          lastPlayer,
+          winner,
+          currentGameId: query.gameId,
+          playerId
+        });
+        console.log(payload);
+        sendJsonMessage(payload);
+      }
+      else {
+        sendJsonMessage({
+          gameId: query.gameId,
+          // Reaching a race condition when trying to access player id state value set in above use effect hook
+          // local storage updates faster and is more reliable in this instance 
+          player: playerId,
+          state: JSON.stringify({}),
+        });
+      }
+    }
+  }, [isReady, readyState]);
+
+  useEffect(() => {
+    console.log(lastMessage);
     if (lastMessage && lastMessage.data !== 'failure') {
       setOpponentConnected(true);
     }
   }, [lastMessage]);
 
-  // On initital render generate userId cookie if none, check for other cookie values
   useEffect(() => {
-    if (!cookies['userId']) {
-      const id = uuid();
-      setCookie('userId', id, { path: '/' });
-      setPlayer({
-        ...player,
-        id: id,
-      });
-    }
-    checkForCookies();
-  }, []);
-
-  // Once gameId has loaded from the router for the first time, set cookie
-  useEffect(() => {
-    if (gameId && !cookies['gameId']) {
-      setCookie('gameId', gameId, { path: '/' });
-    }
-  }, [gameId]);
-
-  // Once the gameId and player id is set, let other player know we've connected
-  useEffect(() => {
-    if (ready && !cookies['gameState']) {
-      sendJsonMessage({
-        gameId: gameId,
-        player: player.id,
-        state: JSON.stringify({}),
-      });
-    }
-  }, [ready]);
-
-  // Update gameState cookie every time theres a change
-  useEffect(() => {
-    if (gameState.version) setCookie('gameState', gameState, { path: '/' });
+    if(gameState.version) localStorage.setItem(gameId, JSON.stringify(gameState));
   }, [gameState]);
 
   // TODO: useEffect hook for sending json message with each gamestate upadte
@@ -147,18 +169,23 @@ export default function Game() {
     }
   }, [lastJsonMessage]);
 
-  // Load cookie values into state if any
-  function checkForCookies() {
-    if (cookies['username']) {
-      setPlayer({
-        ...player,
-        name: cookies['username'],
-        color: cookies['userColor'],
-      });
-    }
-    if (cookies['gameState']) {
-      setGameState(cookies['gameState']);
-    }
+
+  // Pull game data out of localStorage
+  function getLocalStorage(gameValues) {
+    const { version, boardState, players, lastPlayer, winner } = JSON.parse(gameValues);
+    setGameState({
+      version,
+      boardState: boardState,
+      players,
+      lastPlayer,
+      winner
+    });
+    const self = players.find(p => p.id = player.id );
+    setPlayer({
+      ...player,
+      name: self.name,
+      color: self.color,
+    });
   }
 
   // Send color selection to opponent
@@ -180,10 +207,12 @@ export default function Game() {
     players = gameState.players,
     lastPlayer = player.id,
     winner = null,
+    currentGameId = gameId,
+    playerId = player.id,
   }) {
     return {
-      gameId: gameId,
-      player: player.id,
+      gameId: currentGameId,
+      player: playerId,
       state: JSON.stringify({
         version: version,
         boardState: state,
@@ -203,11 +232,13 @@ export default function Game() {
       winner: hasWinner ? player : null,
     });
     sendJsonMessage(payload);
+    console.log(player);
     setGameState({
       ...gameState,
       boardState: boardState,
-      lastPlayer: player.id,
+      lastPlayer: player.id ?? localStorage.getItem('userId'),
       version: newVersion,
+      winner: hasWinner ? player : null
     });
     if (hasWinner) setWinner(player);
   }
@@ -268,14 +299,27 @@ export default function Game() {
       ],
     });
 
-    setCookie('username', color.name, { path: '/' });
-    setCookie('userColor', color.color, { path: '/' });
+    const gameValues = localStorage.getItem(gameId);
+    if(gameValues) {
+      localStorage.setItem(gameId, JSON.stringify({
+        ...JSON.parse(gameValues),
+        userName: color.name,
+        userColor: color.color,
+      }));
+    } else {
+      localStorage.setItem(gameId, JSON.stringify({
+        userName: color.name,
+        userColor: color.color,
+      }));
+    }
+
     sendInitialGameState(color);
   }
 
   // Helper function to get opponent from players list
   function getOtherPlayer() {
-    return gameState.players.find((p) => p.id !== player.id);
+    const id = player.id ?? localStorage.getItem('userId');
+    return gameState.players.find((p) => p.id !== id);
   }
 
   function restartGame() {

@@ -32,3 +32,16 @@
     color: #84cc16;
     font-size: 1rem;
 }
+
+.gamesContainer {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    max-height: 6rem;
+    overflow-y: scroll;
+}
+
+.game {
+    cursor: pointer;
+}

@@ -2,9 +2,9 @@
     border: .5rem solid #3b82f6;
     ;
     align-self: flex-end;
-    max-width: 16rem;
+    max-width: 20rem;
     font-size: 2rem;
-    padding: 1rem 1rem;
+    padding: 1rem 2rem;
     color: #3b82f6;
     font-family: var(--font-ubuntu-mono);
 }

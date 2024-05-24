@@ -1,7 +1,6 @@
 import styles from './../styles/WinnerMessage.module.css';
 
 export default function WinnerMessage({ restart, winner, self }) {
-  console.log(winner);
   let className = winner
     ? `${styles.winnerMessage} ${styles.show}`
     : `${styles.winnerMessage}`;

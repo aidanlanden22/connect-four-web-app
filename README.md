@@ -1,6 +1,6 @@
 # Stateless Connect Four
 
-![Connect Four UI](<../../Desktop/Screenshot 2024-04-30 at 1.42.36 PM.png>)
+![Connect Four UI](</public/Screenshot 2024-04-30 at 1.42.36 PM.png>)
 
 ## Play Connect Four with your friends online!
 
